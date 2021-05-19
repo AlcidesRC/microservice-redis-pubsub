@@ -1,0 +1,3 @@
+./src/vendor
+./src/.phpunit.cache/
+./src/composer.lock

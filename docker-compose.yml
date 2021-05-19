@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+    redis-pubsub:
+        container_name: redis-pubsub
+        build:
+            context: ./docker/images/microservice/
+            dockerfile: Dockerfile
+            target: standalone
+        volumes:
+            - ./src:/code
+            - ./etc/supervisor/conf.d/subscriber.conf:/etc/supervisor/conf.d/subscriber.conf:ro
+        working_dir: /code
+        restart: unless-stopped
+        environment:
+            - SUBSCRIBER__SUBSCRIBE_TO_CHANNEL_1=channel:name1
+            - SUBSCRIBER__SUBSCRIBE_TO_CHANNEL_2=channel:name2
+            - MONOLOG__LEVEL=200
+            - MONOLOG__NAME=redis-pubsub
+            - MONOLOG__STREAM=php://stdout
+            - REDIS__CLUSTER=redis
+            - REDIS__DB=10
+            - REDIS__HOST=redis
+            - REDIS__PORT=6380
+            - REDIS__PREFFIX=pubsub_database_
+            - REDIS__SCHEME=tcp
+        depends_on:
+            - redis
+
+    redis:
+        image: redis:6.2
+        command: --port 6380
+        ports:
+            - "6380:6380"
